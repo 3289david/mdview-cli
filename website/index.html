@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>mdview-cli — Beautiful terminal Markdown viewer</title>
+  <meta name="description" content="A blazing fast terminal Markdown viewer with syntax highlighting, tables, images, math, Mermaid diagrams, presentation mode and more. Just type md README.md." />
+  <meta property="og:title" content="mdview-cli — Beautiful terminal Markdown viewer" />
+  <meta property="og:description" content="Everything Markdown. In your terminal." />
+  <meta name="theme-color" content="#0d1117" />
+  <style>
+    :root {
+      --bg: #0d1117;
+      --bg2: #161b22;
+      --bg3: #1c2128;
+      --border: #30363d;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --cyan: #79c0ff;
+      --green: #3fb950;
+      --yellow: #e3b341;
+      --purple: #bc8cff;
+      --red: #ff7b72;
+      --orange: #ffa657;
+      --accent: #58a6ff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 2rem;
+      background: rgba(13,17,23,.9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-brand {
+      font-family: 'SF Mono', Consolas, 'Cascadia Code', monospace;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--cyan);
+      text-decoration: none;
+    }
+    .nav-brand span { color: var(--muted); }
+    .nav-links { display: flex; gap: 1.5rem; }
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: .9rem;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 6rem 2rem 4rem;
+      text-align: center;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .hero-badge {
+      display: inline-block;
+      padding: .25rem .75rem;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: .78rem;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+      font-family: 'SF Mono', monospace;
+      background: var(--bg2);
+    }
+    .hero h1 {
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      font-weight: 800;
+      letter-spacing: -.02em;
+      line-height: 1.1;
+      margin-bottom: 1.2rem;
+    }
+    .hero h1 .gradient {
+      background: linear-gradient(135deg, var(--cyan) 0%, var(--purple) 60%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero p {
+      font-size: 1.2rem;
+      color: var(--muted);
+      max-width: 600px;
+      margin: 0 auto 2.5rem;
+    }
+    .hero-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .7rem 1.5rem;
+      border-radius: 8px;
+      font-size: .95rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all .2s;
+      cursor: pointer;
+      border: none;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #000;
+    }
+    .btn-primary:hover { background: var(--cyan); transform: translateY(-1px); }
+    .btn-secondary {
+      background: var(--bg2);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { border-color: var(--accent); transform: translateY(-1px); }
+
+    /* ── INSTALL STRIP ── */
+    .install-strip {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      margin: 3rem auto;
+      max-width: 500px;
+    }
+    .install-cmd {
+      flex: 1;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: .75rem 1.2rem;
+      font-family: 'SF Mono', Consolas, monospace;
+      font-size: .95rem;
+      color: var(--green);
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+    .install-cmd .prompt { color: var(--muted); user-select: none; }
+    .copy-btn {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: .75rem 1rem;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all .2s;
+      font-size: .9rem;
+    }
+    .copy-btn:hover { border-color: var(--accent); color: var(--text); }
+    .copy-btn.copied { border-color: var(--green); color: var(--green); }
+
+    /* ── TERMINAL DEMO ── */
+    .demo-section {
+      max-width: 860px;
+      margin: 0 auto 5rem;
+      padding: 0 2rem;
+    }
+    .terminal {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,.4);
+    }
+    .terminal-titlebar {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .8rem 1rem;
+      background: var(--bg3);
+      border-bottom: 1px solid var(--border);
+    }
+    .dot { width: 12px; height: 12px; border-radius: 50%; }
+    .dot-red   { background: #ff5f57; }
+    .dot-yellow{ background: #ffbd2e; }
+    .dot-green { background: #28c840; }
+    .terminal-title {
+      flex: 1;
+      text-align: center;
+      font-size: .8rem;
+      color: var(--muted);
+      font-family: 'SF Mono', monospace;
+    }
+    .terminal-body {
+      padding: 1.5rem;
+      font-family: 'SF Mono', Consolas, 'Cascadia Code', monospace;
+      font-size: .85rem;
+      line-height: 1.7;
+      overflow-x: auto;
+    }
+    .term-prompt { color: var(--green); }
+    .term-cmd { color: var(--text); }
+    .term-h1 { color: var(--cyan); font-weight: 700; border-bottom: 2px solid var(--cyan); display: inline-block; }
+    .term-h2 { color: var(--cyan); font-weight: 600; }
+    .term-h2-ul { color: var(--cyan); }
+    .term-h3 { color: var(--yellow); }
+    .term-bullet { color: var(--cyan); }
+    .term-done { color: var(--green); }
+    .term-todo { color: var(--muted); }
+    .term-code-border { color: var(--muted); }
+    .term-code-lang { color: var(--yellow); }
+    .term-code-kw { color: var(--purple); }
+    .term-code-str { color: var(--green); }
+    .term-code-fn { color: var(--cyan); }
+    .term-code-num { color: var(--orange); }
+    .term-table-border { color: var(--muted); }
+    .term-table-head { color: var(--text); font-weight: 700; }
+    .term-table-cell { color: var(--muted); }
+    .term-math { color: var(--yellow); }
+    .term-blockquote { color: var(--muted); font-style: italic; }
+    .term-cyan { color: var(--cyan); }
+    .term-dim { color: var(--muted); }
+    .term-mermaid { color: var(--purple); }
+    .term-link { color: var(--cyan); text-decoration: underline; }
+
+    /* ── FEATURES ── */
+    .features {
+      max-width: 1100px;
+      margin: 0 auto 6rem;
+      padding: 0 2rem;
+    }
+    .section-label {
+      text-align: center;
+      font-size: .8rem;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--muted);
+      margin-bottom: .75rem;
+    }
+    .section-title {
+      text-align: center;
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      font-weight: 700;
+      margin-bottom: 3rem;
+      letter-spacing: -.01em;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem;
+    }
+    .feature-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      transition: border-color .2s, transform .2s;
+    }
+    .feature-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+    .feature-icon { font-size: 1.8rem; margin-bottom: .8rem; }
+    .feature-title { font-size: 1rem; font-weight: 700; margin-bottom: .4rem; }
+    .feature-desc { font-size: .88rem; color: var(--muted); line-height: 1.5; }
+    .feature-tag {
+      display: inline-block;
+      margin-top: .6rem;
+      padding: .15rem .5rem;
+      border-radius: 4px;
+      font-size: .72rem;
+      font-family: 'SF Mono', monospace;
+      background: var(--bg3);
+      color: var(--cyan);
+      border: 1px solid var(--border);
+    }
+
+    /* ── USAGE ── */
+    .usage {
+      max-width: 800px;
+      margin: 0 auto 6rem;
+      padding: 0 2rem;
+    }
+    .usage-block {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+      font-family: 'SF Mono', Consolas, monospace;
+      font-size: .88rem;
+    }
+    .usage-row { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: .35rem; }
+    .usage-row:last-child { margin-bottom: 0; }
+    .usage-cmd { color: var(--cyan); min-width: 260px; }
+    .usage-desc { color: var(--muted); }
+
+    /* ── SHELL INT ── */
+    .shell-integration {
+      max-width: 800px;
+      margin: 0 auto 6rem;
+      padding: 0 2rem;
+    }
+    .shell-code {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      font-family: 'SF Mono', Consolas, monospace;
+      font-size: .85rem;
+      overflow-x: auto;
+    }
+    .shell-code .comment { color: var(--muted); }
+    .shell-code .keyword { color: var(--purple); }
+    .shell-code .string { color: var(--green); }
+    .shell-code .cmd { color: var(--cyan); }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 3rem 2rem;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: .85rem;
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+    .footer-badges { display: flex; gap: .5rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1rem; }
+    .badge { font-size: .75rem; }
+
+    @media (max-width: 600px) {
+      .install-strip { flex-direction: column; }
+      .usage-row { flex-direction: column; gap: .25rem; }
+      .usage-cmd { min-width: unset; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-brand" href="#"><span>$ </span>mdview-cli</a>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#usage">Usage</a>
+    <a href="https://github.com/danwoo1234/mdview-cli" target="_blank">GitHub</a>
+    <a href="https://www.npmjs.com/package/mdview-cli" target="_blank">npm</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">v1.0.0 · MIT License · Node 18+</div>
+  <h1>
+    Markdown, <span class="gradient">beautifully</span><br />in your terminal.
+  </h1>
+  <p>
+    Full CommonMark + GFM support. Syntax highlighting, tables, images,
+    math, Mermaid diagrams, presentation mode, watch mode, and more.
+  </p>
+  <div class="hero-buttons">
+    <a href="https://www.npmjs.com/package/mdview-cli" class="btn btn-primary" target="_blank">
+      ↓ Install via npm
+    </a>
+    <a href="https://github.com/danwoo1234/mdview-cli" class="btn btn-secondary" target="_blank">
+      ★ View on GitHub
+    </a>
+  </div>
+</section>
+
+<!-- INSTALL -->
+<div class="install-strip">
+  <div class="install-cmd">
+    <span class="prompt">$</span>
+    <span id="install-text">npm install -g mdview-cli</span>
+  </div>
+  <button class="copy-btn" id="copyBtn" onclick="copyInstall()">Copy</button>
+</div>
+
+<!-- DEMO TERMINAL -->
+<div class="demo-section">
+  <div class="terminal">
+    <div class="terminal-titlebar">
+      <span class="dot dot-red"></span>
+      <span class="dot dot-yellow"></span>
+      <span class="dot dot-green"></span>
+      <span class="terminal-title">zsh — 80×24</span>
+    </div>
+    <div class="terminal-body">
+<pre><span class="term-prompt">❯</span> <span class="term-cmd">md README.md</span>
+
+<span class="term-cyan">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+<span class="term-cyan">               MY AWESOME PROJECT</span>
+<span class="term-cyan">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+
+  <span class="term-h2">Features</span>
+  <span class="term-h2-ul">────────────</span>
+
+  <span class="term-bullet">▸</span> <span class="term-h3">Installation</span>
+
+  <span class="term-bullet">•</span> Works everywhere Node 18+ runs
+  <span class="term-bullet">•</span> Zero config needed
+  <span class="term-bullet">•</span> <span class="term-dim">Supports</span> <span style="font-style:italic">italic</span>, <strong>bold</strong>, ~~strikethrough~~
+
+<span class="term-code-border">╭─</span> <span class="term-code-lang">TypeScript</span> <span class="term-code-border">───────────────────────────────────╮</span>
+<span class="term-code-border">│</span> <span class="term-code-kw">const</span> render = <span class="term-code-kw">async</span> (file: <span class="term-code-fn">string</span>) => {
+<span class="term-code-border">│</span>   <span class="term-code-kw">const</span> md = <span class="term-code-fn">readFileSync</span>(file, <span class="term-code-str">'utf-8'</span>);
+<span class="term-code-border">│</span>   <span class="term-code-kw">await</span> <span class="term-code-fn">print</span>(md);
+<span class="term-code-border">│</span> };
+<span class="term-code-border">╰────────────────────────────────────────────────────╯</span>
+
+<span class="term-table-border">┌──────────┬────────┬──────────────┐</span>
+<span class="term-table-border">│</span> <span class="term-table-head">Feature</span>  <span class="term-table-border">│</span> <span class="term-table-head">Status</span> <span class="term-table-border">│</span> <span class="term-table-head">Notes</span>        <span class="term-table-border">│</span>
+<span class="term-table-border">├──────────┼────────┼──────────────┤</span>
+<span class="term-table-border">│</span> <span class="term-table-cell">Tables</span>   <span class="term-table-border">│</span> <span class="term-done">✔ Done</span>  <span class="term-table-border">│</span> <span class="term-table-cell">GFM tables</span>   <span class="term-table-border">│</span>
+<span class="term-table-border">│</span> <span class="term-table-cell">Mermaid</span>  <span class="term-table-border">│</span> <span class="term-done">✔ Done</span>  <span class="term-table-border">│</span> <span class="term-table-cell">ASCII render</span> <span class="term-table-border">│</span>
+<span class="term-table-border">│</span> <span class="term-table-cell">Math</span>     <span class="term-table-border">│</span> <span class="term-done">✔ Done</span>  <span class="term-table-border">│</span> <span class="term-table-cell">Unicode</span>      <span class="term-table-border">│</span>
+<span class="term-table-border">└──────────┴────────┴──────────────┘</span>
+
+  <span class="term-done">☑</span> Syntax highlighting
+  <span class="term-done">☑</span> Mermaid diagrams
+  <span class="term-todo">☐</span> Your next feature
+
+<span class="term-cyan">┃</span> <span class="term-blockquote">"The best tool is the one you actually use."</span>
+
+  <span class="term-math">──────────────────</span>
+  <span class="term-math">E = mc²   ∫ₐᵇ f(x)dx</span>
+  <span class="term-math">──────────────────</span>
+
+<span class="term-dim">────────────────────────────────────────────────────</span>
+</pre>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <p class="section-label">Everything Markdown</p>
+  <h2 class="section-title">Every feature. Zero config.</h2>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">✨</div>
+      <div class="feature-title">Full Markdown Support</div>
+      <div class="feature-desc">CommonMark + GFM: headings, paragraphs, bold, italic, strikethrough, inline code, links, images, blockquotes, and horizontal rules.</div>
+      <span class="feature-tag">CommonMark + GFM</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🎨</div>
+      <div class="feature-title">Syntax Highlighting</div>
+      <div class="feature-desc">30+ languages with language-specific colors. JavaScript, TypeScript, Python, Rust, Go, SQL, YAML, and more — all beautifully highlighted.</div>
+      <span class="feature-tag">highlight.js</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">⊞</div>
+      <div class="feature-title">Tables</div>
+      <div class="feature-desc">GFM tables rendered with box-drawing characters, proper column alignment (left, center, right), and bold headers.</div>
+      <span class="feature-tag">┌──┬──┐</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">☑</div>
+      <div class="feature-title">Task Lists</div>
+      <div class="feature-desc">GitHub-style checkbox lists rendered as ☑ / ☐ with visual distinction between completed and pending tasks.</div>
+      <span class="feature-tag">☑ ☐</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔗</div>
+      <div class="feature-title">Clickable Links</div>
+      <div class="feature-desc">OSC 8 terminal hyperlinks for iTerm2, WezTerm, Kitty, and other modern terminals. Ctrl+Click to open URLs directly.</div>
+      <span class="feature-tag">OSC 8</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🖼</div>
+      <div class="feature-title">Image Rendering</div>
+      <div class="feature-desc">Local and remote images rendered inline with terminal-image on supported terminals. ASCII art placeholder fallback for others.</div>
+      <span class="feature-tag">terminal-image</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📊</div>
+      <div class="feature-title">Mermaid Diagrams</div>
+      <div class="feature-desc">Flowcharts, sequence diagrams, pie charts, Gantt charts, class diagrams, state diagrams — all rendered as beautiful ASCII art.</div>
+      <span class="feature-tag">8 diagram types</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">∑</div>
+      <div class="feature-title">Math / LaTeX</div>
+      <div class="feature-desc">Block ($$) and inline ($) math rendered with Unicode characters: superscripts, subscripts, Greek letters, operators, and more.</div>
+      <span class="feature-tag">α β γ ∫ Σ ≤</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">👁</div>
+      <div class="feature-title">Watch Mode</div>
+      <div class="feature-desc">Automatically re-renders when the file is saved. Perfect for writing Markdown with live preview in a split terminal.</div>
+      <span class="feature-tag">--watch</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🎞</div>
+      <div class="feature-title">Presentation Mode</div>
+      <div class="feature-desc">Use --- as slide separator, then md slides.md --present to navigate with arrow keys. Full-screen, keyboard-driven slides.</div>
+      <span class="feature-tag">--present</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📁</div>
+      <div class="feature-title">Directory Browser</div>
+      <div class="feature-desc">Run md . to browse Markdown files with keyboard navigation. Navigate directories, preview, and open files instantly.</div>
+      <span class="feature-tag">md .</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">⚡</div>
+      <div class="feature-title">Shebang Support</div>
+      <div class="feature-desc">Add #!/usr/bin/env md as the first line, chmod +x, and run ./notes.md directly. Markdown documents as executable apps.</div>
+      <span class="feature-tag">chmod +x</span>
+    </div>
+  </div>
+</section>
+
+<!-- USAGE -->
+<section class="usage" id="usage">
+  <p class="section-label">Usage</p>
+  <h2 class="section-title">Start in seconds</h2>
+
+  <div class="usage-block">
+    <div class="usage-row">
+      <span class="usage-cmd">md README.md</span>
+      <span class="usage-desc">Render any Markdown file</span>
+    </div>
+    <div class="usage-row">
+      <span class="usage-cmd">md .</span>
+      <span class="usage-desc">Interactive file browser</span>
+    </div>
+    <div class="usage-row">
+      <span class="usage-cmd">md README.md --watch</span>
+      <span class="usage-desc">Watch mode (auto re-render on save)</span>
+    </div>
+    <div class="usage-row">
+      <span class="usage-cmd">md slides.md --present</span>
+      <span class="usage-desc">Presentation / slideshow mode</span>
+    </div>
+    <div class="usage-row">
+      <span class="usage-cmd">md ~/docs/</span>
+      <span class="usage-desc">Browse Markdown in any directory</span>
+    </div>
+    <div class="usage-row">
+      <span class="usage-cmd">md --help</span>
+      <span class="usage-desc">Show full help text</span>
+    </div>
+  </div>
+</section>
+
+<!-- SHELL INTEGRATION -->
+<section class="shell-integration" id="shell">
+  <p class="section-label">Pro tip</p>
+  <h2 class="section-title">Type README.md. Just works.</h2>
+  <p style="text-align:center;color:var(--muted);margin-bottom:2rem;">Add this shell function to auto-open <code style="background:var(--bg2);padding:.1em .4em;border-radius:4px;color:var(--cyan);">*.md</code> files when you type their name.</p>
+
+  <div class="shell-code">
+<pre><span class="comment"># ~/.zshrc or ~/.bashrc</span>
+<span class="keyword">command_not_found_handler</span>() {
+  <span class="keyword">if</span> [[ <span class="string">"$1"</span> == *.md ]] && [ -f <span class="string">"$1"</span> ]; <span class="keyword">then</span>
+    <span class="cmd">md</span> <span class="string">"$1"</span>
+    <span class="keyword">return</span> 0
+  <span class="keyword">fi</span>
+  <span class="keyword">return</span> 127
+}
+
+<span class="comment"># Then reload your shell:</span>
+<span class="cmd">source ~/.zshrc</span>
+
+<span class="comment"># Now just type:</span>
+<span class="cmd">README.md</span>   <span class="comment"># ← opens and renders instantly!</span></pre>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-badges">
+    <img class="badge" src="https://img.shields.io/npm/v/mdview-cli?style=flat-square&color=58a6ff" alt="npm version" />
+    <img class="badge" src="https://img.shields.io/npm/l/mdview-cli?style=flat-square&color=3fb950" alt="MIT" />
+    <img class="badge" src="https://img.shields.io/node/v/mdview-cli?style=flat-square&color=e3b341" alt="Node" />
+  </div>
+  <p>
+    Made with ♥ by <a href="https://github.com/danwoo1234" target="_blank">danwoo1234</a>
+    &nbsp;·&nbsp;
+    <a href="https://github.com/danwoo1234/mdview-cli" target="_blank">GitHub</a>
+    &nbsp;·&nbsp;
+    <a href="https://www.npmjs.com/package/mdview-cli" target="_blank">npm</a>
+    &nbsp;·&nbsp;
+    MIT License
+  </p>
+</footer>
+
+<script>
+  function copyInstall() {
+    navigator.clipboard.writeText('npm install -g mdview-cli').then(() => {
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = 'Copy';
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  }
+</script>
+
+</body>
+</html>

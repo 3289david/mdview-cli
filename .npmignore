@@ -1,0 +1,7 @@
+src/
+website/
+test.md
+tsconfig.json
+tsup.config.ts
+*.log
+.DS_Store
