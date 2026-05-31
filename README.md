@@ -1,15 +1,16 @@
-# mdview-cli
+# md-terminal
 
-[![npm version](https://img.shields.io/npm/v/mdview-cli?style=flat-square\&color=58a6ff)](https://www.npmjs.com/package/mdview-cli)
-[![MIT](https://img.shields.io/npm/l/mdview-cli?style=flat-square\&color=3fb950)](https://opensource.org/licenses/MIT)
-[![Node](https://img.shields.io/node/v/mdview-cli?style=flat-square\&color=e3b341)](https://nodejs.org/)
+[![npm version](https://img.shields.io/npm/v/md-terminal?style=flat-square\&color=58a6ff)](https://www.npmjs.com/package/md-terminal)
+[![MIT](https://img.shields.io/npm/l/md-terminal?style=flat-square\&color=3fb950)](https://opensource.org/licenses/MIT)
+[![Node](https://img.shields.io/node/v/md-terminal?style=flat-square\&color=e3b341)](https://nodejs.org/)
+[![Website](https://img.shields.io/website/http://md.krl.kr?style=flat-square\&color=e3b341)](https://md.krl.kr)
     
 Beautiful terminal Markdown viewer — syntax highlighting, tables, images, math, Mermaid diagrams, presentation mode, watch mode, and more.
 
 ## Install
 
 ```bash
-npm install -g mdview-cli
+npm install -g md-terminal
 ```
 
 ## Usage

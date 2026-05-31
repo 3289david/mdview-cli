@@ -1,5 +1,5 @@
 {
-  "name": "@rukkit/mdview-cli",
+  "name": "md-terminal",
   "version": "1.0.0",
   "description": "Beautiful terminal Markdown viewer — syntax highlighting, tables, images, math, Mermaid, presentation mode & more",
   "bin": {
