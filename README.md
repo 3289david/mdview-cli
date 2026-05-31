@@ -1,5 +1,9 @@
 # mdview-cli
 
+    <img class="badge" src="https://img.shields.io/npm/v/mdview-cli?style=flat-square&color=58a6ff" alt="npm version" />
+    <img class="badge" src="https://img.shields.io/npm/l/mdview-cli?style=flat-square&color=3fb950" alt="MIT" />
+    <img class="badge" src="https://img.shields.io/node/v/mdview-cli?style=flat-square&color=e3b341" alt="Node" />
+    
 Beautiful terminal Markdown viewer — syntax highlighting, tables, images, math, Mermaid diagrams, presentation mode, watch mode, and more.
 
 ## Install
