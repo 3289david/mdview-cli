@@ -3,8 +3,8 @@
 [![npm version](https://img.shields.io/npm/v/md-terminal?style=flat-square\&color=58a6ff)](https://www.npmjs.com/package/md-terminal)
 [![MIT](https://img.shields.io/npm/l/md-terminal?style=flat-square\&color=3fb950)](https://opensource.org/licenses/MIT)
 [![Node](https://img.shields.io/node/v/md-terminal?style=flat-square\&color=e3b341)](https://nodejs.org/)
-[![Website](https://img.shields.io/badge/Website-md.krl.kr?style=for-the-badge\&color=e3b341)](https://md.krl.kr)
-    
+[![Website](https://img.shields.io/badge/Website-md_krl_kr-e3b341?style=for-the-badge)](https://md.krl.kr)
+
 Beautiful terminal Markdown viewer — syntax highlighting, tables, images, math, Mermaid diagrams, presentation mode, watch mode, and more.
 
 ## Install
