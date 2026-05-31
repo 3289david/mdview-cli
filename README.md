@@ -1,8 +1,8 @@
 # mdview-cli
 
-    <img class="badge" src="https://img.shields.io/npm/v/mdview-cli?style=flat-square&color=58a6ff" alt="npm version" />
-    <img class="badge" src="https://img.shields.io/npm/l/mdview-cli?style=flat-square&color=3fb950" alt="MIT" />
-    <img class="badge" src="https://img.shields.io/node/v/mdview-cli?style=flat-square&color=e3b341" alt="Node" />
+[![npm version](https://img.shields.io/npm/v/mdview-cli?style=flat-square\&color=58a6ff)](https://www.npmjs.com/package/mdview-cli)
+[![MIT](https://img.shields.io/npm/l/mdview-cli?style=flat-square\&color=3fb950)](https://opensource.org/licenses/MIT)
+[![Node](https://img.shields.io/node/v/mdview-cli?style=flat-square\&color=e3b341)](https://nodejs.org/)
     
 Beautiful terminal Markdown viewer — syntax highlighting, tables, images, math, Mermaid diagrams, presentation mode, watch mode, and more.
 
